@@ -198,6 +198,10 @@ const Playground = (function() {
 		options.width = qsel('#option-width select').value
 		options.height = qsel('#option-height select').value
 
+		//
+		//options.captions = false
+		//
+
 		updateOptions(options)
 		initEditor(options)
 	}
