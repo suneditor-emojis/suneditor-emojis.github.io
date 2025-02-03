@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" translate="no">
+<head>
+<meta charset="utf-8">
+<title>suneditor-emojis playground</title>
+<meta name="description" content="Emojis dropdown plugin for SunEditor, the wysywyg editor">
+<link rel="shortcut icon" href="#">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css">
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+<script src="src/playground.js"></script>
+<link href="src/playground.css" rel="stylesheet" type="text/css" >
+<script src="suneditor-emojis/suneditor-emojis.min.js"></script>
+<link href="suneditor-emojis/suneditor-emojis.css" rel="stylesheet" type="text/css" >
+<meta property="og:url" content="https://suneditor-emojis.github.io">
+<meta property="og:locale" content="en_GB">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="suneditor-emojis playground">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://detfrieord.dk/">
+<meta name="twitter:site" content="@detfrieord">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebPage",
+ "name": "Det frie ord",
+ "description": "Danmarks eneste reelt frie brugerstyrede platform. Det er gratis, der er ingen censur, du kan være anonym og så er der hverken tracking eller reklamer!",
+ "publisher": {
+   "@type": "Organization",
+   "name": "Det frie ord",
+   "logo": {
+     "@type": "ImageObject",
+     "url": "https://detfrieord.dk/favicon/android-chrome-512x512.png"
+   }
+ }
+}
+</script>
+
+</head>
+<body>
+<h1>suneditor-emojis playground</h1>
+<hr>
+<header>
+<h3>
+<img src="assets/GitHub-Mark-32px.png" alt="octocat" width="24" height="24">
+<a href="https://github.com/davidkonrad/suneditor-emojis" title="Clone, fork or download the repo">https://github.com/davidkonrad/suneditor-emojis</a>
+</h3>
+</header>
+<hr>
+<aside>
+	<details id="option-groups-captions" open>
+		<summary>groups and captions</summary>
+		<div style="display:table;" title="drag-drop to change the order">
+		</div>
+	</details>
+
+	<details id="option-topmenu" open>
+		<summary>topmenu</summary>
+		<div class="flex-row" title="drag-drop to change the order">
+			<div class="item-sortable">
+				<label class="fieldset-item" title="Show search" style="cursor:pointer;">
+					<input type="checkbox" name="search" checked>search
+				</label>
+			</div>
+			<div class="item-sortable">
+				<label class="fieldset-item" title="Show iconSize" style="cursor:pointer;">
+					<input type="checkbox" name="iconSize" checked>iconSize
+				</label>
+<!--
+				<input type="number" step="0.1" id="option-topmenu-iconSize-step" value="0.2" size="2" min="0.1" max="5" style="width:3rem;">
+-->
+			</div>
+			<div class="item-sortable">
+				<label class="fieldset-item" title="Show skinTone" style="cursor:pointer;">
+					<input type="checkbox" name="skinTone" checked>skinTone
+				</label>
+			</div>
+		</div>
+		<div id="option-showRecent">
+			<label title="Show recent clicked emojis">
+				<input type="checkbox" checked>showRecent
+			</label>
+		</div>
+	</details>
+
+	<details id="option-icons" open>
+		<summary>icons</summary>
+		<div>
+			<div id="option-iconSize" class="option-margin-bottom">
+				<label class="fieldset-item" title="iconSize">
+					iconSize
+					<select id="select-iconsize"></select>
+					<span id="iconsize-current" style="color:gray;">default</span>
+				</label>
+			</div>
+			<div id="option-skinTone">
+				<label title="neutral">
+					<input type="radio" value="neutral" name="skinTone" checked>👍
+				</label>
+				<label title="dark">
+					<input type="radio" value="dark" name="skinTone">👍🏿
+				</label>
+				<label title="medium dark">
+					<input type="radio" value="mediumDark" name="skinTone">👍🏾
+				</label>
+				<label title="medium" >
+					<input type="radio" value="medium" name="skinTone">👍🏽
+				</label>
+				<label title="medium light">
+					<input type="radio" value="mediumLight" name="skinTone">👍🏼
+				</label>
+				<label title="light">
+					<input type="radio" value="light" name="skinTone">👍🏻
+				</label>
+			</div>
+		</div>
+	</details>
+
+	<details id="option-misc" open>
+		<summary>misc</summary>
+		<div>
+			<div id="option-showFallbacks" class="option-margin-bottom">
+				<label title="Show fallback emojis">
+					<input type="checkbox">showFallbacks
+				</label>
+			</div>
+
+			<div id="option-tagName" class="option-margin-bottom">
+				tagName
+				<select>
+					<option value="">none</option>
+					<option value="span" selected>span</option>
+					<option value="i">i</option>
+					<option value="b">b</option>
+					<option value="em">em</option>
+					<option value="font">font</option>
+				</select>
+			</div>
+
+			<div class="flex-row">
+				<span id="option-width">
+					width
+					<select>
+						<option value="" selected>default</option>
+						<option value="10vw">10vw</option>
+						<option value="20vw">20vw</option>
+						<option value="30vw">30vw</option>
+						<option value="40vw">40vw</option>
+						<option value="50vw">50w</option>
+					</select>
+				</span>
+				<span id="option-height">
+					height
+					<select>
+						<option value="" selected>default</option>
+						<option value="10vw">10vw</option>
+						<option value="20vw">20vw</option>
+						<option value="30vw">30vw</option>
+						<option value="40vw">40vw</option>
+						<option value="50vw">50vw</option>
+						<option value="60vw">60vw</option>
+					</select>
+				</span>
+			</div>
+		</div>
+	</details>
+
+	<p id="option-settings" style="text-align:center">
+		<label title="Remember the settings next time you visit the page">
+			<input type="checkbox" checked>Save settings locally
+		</label>
+	</p>		
+
+</aside>
+
+<main>
+	<textarea id="editor" tabindex="-1"></textarea><br>
+	<details open>
+		<summary>Options</summary>
+		<pre id="options"></pre>
+	</details>
+</main>
+
+</body>
+</html>

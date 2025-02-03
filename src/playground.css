@@ -1,0 +1,145 @@
+/* paste this into your production CSS */
+.se-emoji {
+	font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: system-ui, sans-serif; 
+	background: #fff9f1;
+	min-height: 100vh;
+	font-family: helvetica;
+	color: #333;
+	margin-left: 2rem;
+	margin-top: 1rem;
+}
+
+header h3 {
+	display: flex;
+	align-items: center;
+}
+
+header h3 a {
+	color: navy;
+	margin-left: .3rem;
+	text-decoration: none;
+}
+header h3 a:hover {
+	color: royalblue;
+}
+
+aside {
+	float: left;
+	padding: 1rem;
+	padding-top: 0;
+	display: block;
+}
+main {
+	float: left;
+	margin-left: .5rem;
+	width: 45%;
+}
+h1 {
+	margin-top: 0;
+	margin-block-end: .5rem;
+	font-size: 3rem;
+}
+h4 {
+	margin-bottom: 0;
+}
+summary {
+	cursor: pointer;
+}
+
+label.fieldset-item {
+	padding: .1rem;
+	margin-bottom: .2rem;
+	margin-left: .1rem;
+	margin-right: .1rem;
+	user-select: none;
+}
+label.fieldset-item input {
+	margin-right: .3rem;
+}
+input.fieldset-item {
+	padding: .1rem;
+	padding-top: .18rem;
+	margin-bottom: .2rem;
+	margin-left: .5rem;
+	margin-right: .2rem;
+	user-select: none;
+}
+
+div.active {
+	background: #ccc;
+}
+
+/* --- */
+summary {
+	user-select: none;
+	list-style-position: outside;
+	margin-left: 30px;
+	padding: .5rem;
+	padding-bottom: .4rem;
+	border-radius: 5px;
+	color: #000;
+}
+
+details[open] summary {
+	border-radius: 5px 5px 0 0;
+}
+
+details {
+  background: #e4eaef;
+  border-radius: 5px;
+	border-top-left-radius: 0;
+	margin-bottom: 1rem;
+}
+
+pre {
+	background: #fff; /*455e7b; */
+	border-radius: 5px;
+	padding: 1rem;
+	margin-top: 0;
+}
+
+details code {
+	font-size: 1.1em;
+}
+
+details div {
+	padding-left: .5rem;
+	padding-right: .5rem;
+	padding-top: .5rem;
+	padding-bottom: .5rem;
+	background: #fff;
+	border: 2px solid #e4eaef;
+}
+
+details label {
+	cursor: pointer;
+}
+
+input[type="number"],
+input[type="text"],
+input[type="radio"] {
+	border: 1px solid #dadada;
+}
+
+select {
+	border: 1px solid #dadada;
+	background: #e4eaef;
+	padding: 3px;
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: flex-row;
+	justify-content: space-evenly; 
+}
+.option-margin-bottom {
+	margin-bottom: .3rem;
+}
