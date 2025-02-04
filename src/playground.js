@@ -171,6 +171,26 @@ const Playground = (function() {
 			s = 'emojis: ' + s
 		}
 		gebi('options').innerText = s
+		initClipboard()
+	}
+
+	const initClipboard = function() {
+		console.log('ok')
+		const action = gebi('copy-action')
+		const success = gebi('copy-success')
+		action.style.display = 'block'
+		success.style.display = 'none'
+		action.addEventListener('click', function(e) {
+			e.preventDefault()
+			const o = gebi('options').innerText
+			try {
+				navigator.clipboard.writeText(o)
+				action.style.display = 'none'
+				success.style.display = 'block'
+			} catch (error) {
+				console.error('Failed to copy: ', error)
+			}
+		})
 	}
 
 	const updateEditor = function() {
