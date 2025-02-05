@@ -97,21 +97,38 @@ const Playground = (function() {
 				if (this.oldValue !== this.value) updateEditor()
 			}
 		})
+		cnt.querySelector('#option-captions-disable').onclick = function() {
+			const checked = this.checked
+			cnt.querySelectorAll('input[type="text"]').forEach(function(input) {
+				if (checked) {
+					input.setAttribute('disabled', 'disabled')
+				} else {
+					input.removeAttribute('disabled')
+				}
+			})
+			updateEditor()
+		}
 	}
 
 	const initForm = function() {
 		const groups = ['Smileys & Emotion', 'Activities', 'Animals & Nature', 'Flags', 'Food & Drink', 'Objects', 'People & Body', 'Symbols', 'Travel & Places']
 		const div = gebi('option-groups-captions').querySelector('div')
 		for (const group of groups) {
-			const html = `
-				<div class="item-sortable" style="display:table-row;" title="${group}">
+			div.insertAdjacentHTML('beforeend', `<div class="item-sortable" style="display:table-row;" title="${group}">
 					<label class="fieldset-item" style="display:table-cell;cursor:pointer">
 						<input type="checkbox" name="${group}" checked>${group}</label>
 					</label>
 					<input class="fieldset-item" type="text" name="${group}" value="${group}" style="display:table-cell;" spellcheck="false">
-				</div>`
-			div.insertAdjacentHTML('beforeend', html)
+				</div>`)
 		}
+
+		div.insertAdjacentHTML('beforeend', `<div style="display:table-row;font-size:small;user-select:false;">
+			<span style="display:table-cell;"></span>
+			<label style="display:table-cell;cursor:pointer;text-align:right;padding-top:.3rem;" title="One large group">
+				No captions
+				<input type="checkbox" id="option-captions-disable" style="position:relative;top:2px;">
+			</label></div>`)
+
 		initOrderable(div, 'groups-captions')
 		initGroups()
 
@@ -175,7 +192,6 @@ const Playground = (function() {
 	}
 
 	const initClipboard = function() {
-		console.log('ok')
 		const action = gebi('copy-action')
 		const success = gebi('copy-success')
 		action.style.display = 'block'
@@ -200,7 +216,7 @@ const Playground = (function() {
 			topmenu: {},
 		}
 		qsel('#option-groups-captions div').querySelectorAll('input[type="checkbox"]').forEach(function(input) {
-			if (input.checked) {
+			if (input.checked && input.name) {
 				options.groups.push(input.name)
 				options.captions.push(input.parentElement.nextElementSibling.value)
 			}
@@ -217,11 +233,7 @@ const Playground = (function() {
 		options.tagName = qsel('#option-tagName select').value
 		options.width = qsel('#option-width select').value
 		options.height = qsel('#option-height select').value
-
-		//
-		//options.captions = false
-		//
-
+		if (qsel('#option-captions-disable').checked) options.captions = false
 		updateOptions(options)
 		initEditor(options)
 	}

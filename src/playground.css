@@ -123,6 +123,7 @@ details label {
 	cursor: pointer;
 }
 
+input[type="checkbox"],
 input[type="number"],
 input[type="text"],
 input[type="radio"] {

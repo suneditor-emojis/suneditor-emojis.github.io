@@ -251,41 +251,24 @@ const emojis = (function(Emojis) {	// eslint-disable-line no-unused-vars
 
 	const add = function(core, targetElement) {
 		_core = core
-		setOptions()
+		options = Object.assign({}, default_options, _core.options.emojis)
 		let listDiv = setSubmenu.call(core)
+		const topmenu = listDiv.querySelector('div[name="' + topmenu_name + '"]')
 		populateEmojis(listDiv)
-		if (options.showRecent) updateRecent(listDiv)
-		setTopmenu(listDiv.querySelector('div[name="' + topmenu_name + '"]'))
+		setTopmenu(topmenu)
 		core.initMenuTarget(name, targetElement, listDiv)
 		if (options.height) {
 			document.querySelector('.se-emojis').style.height = options.height
 			document.querySelector('.se-emojis-layer').style.overflowY = 'hidden'
 		}
 		if (options.width) document.querySelector('.se-emojis').style.width = options.width
-	}
-
-	const setOptions = function() {
-		const test = function(prop, type) {
-			const warn = function() {
-				options[prop] = default_options[prop]
-				console.warn(`emojis.${prop} should be of type ${type}`)
-			}	
-			if (type === 'array') {
-				if (!Array.isArray(options[prop])) warn()
-			} else {
-				if (typeof options[prop] !== type) warn()
+		if (options.showRecent) {
+			updateRecent(listDiv)
+			if (topmenu) {
+				setTimeout(function() {
+					listDiv.querySelector('div[name="' + recent_name + '"]').style.marginTop = topmenu.offsetHeight + 'px'
+				})
 			}
-		}
-		if (_core.options.emojis) {
-			//if (_core.options.emojis.captions === false) _core.options.emojis.captions = Array(default_groups.length).fill('')
-			options = Object.assign({}, default_options, _core.options.emojis)
-/*
-			test('groups', 'array')
-			test('captions', 'array')
-			test('iconSize', 'string')
-			test('skinTone', 'string')
-			test('showFallbacks', 'boolean')
-*/
 		}
 	}
 
@@ -301,8 +284,7 @@ const emojis = (function(Emojis) {	// eslint-disable-line no-unused-vars
 			html += `<div name="${topmenu_name}" class="topmenu"></div>`
 		}
 		if (options.showRecent) {
-			const s = topmenu ? 'style="margin-top:2.2rem;"' : ''
-			html += `<div name="${recent_name}" ${s} class="se-emojis-recent"></div>`
+			html += `<div name="${recent_name}" class="se-emojis-recent"></div>`
 		}
 		if (topmenu && options.topmenu.search) {
 			html += `<div name="${result_name}" class="se-emojis-group se-emojis-result" style="font-size:${options.iconSize};"></div>`
