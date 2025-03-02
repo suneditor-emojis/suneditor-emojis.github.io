@@ -102,7 +102,7 @@ const Emojis = (function() {	// eslint-disable-line no-unused-vars
 			}
 			return c > 2
 		}
-		let res = undefined
+		let res = 1
 		if (canRender()) {
 			if (testFallback(emoji) > emoji_width) {
 				res = isNativeCompound(emoji) ? 1 : 2
@@ -207,7 +207,7 @@ const Emojis = (function() {	// eslint-disable-line no-unused-vars
 	}
 
 })();
-
+Emojis.init();
 const emojis = (function(Emojis) {	// eslint-disable-line no-unused-vars
 	const name = 'emojis'
 	const display = 'submenu'
@@ -247,7 +247,7 @@ const emojis = (function(Emojis) {	// eslint-disable-line no-unused-vars
 	}
 	const default_options = Object.assign({}, options)
 
-	Emojis.init()
+	//Emojis.init()
 
 	const add = function(core, targetElement) {
 		_core = core
@@ -273,7 +273,6 @@ const emojis = (function(Emojis) {	// eslint-disable-line no-unused-vars
 	}
 
 	const setSubmenu = function() {
-		document.body.style.cursor = 'wait'
 		const topmenu = options.topmenu && (options.topmenu.search || options.topmenu.iconSize || options.topmenu.skinTone)
 		let listDiv = this.util.createElement('div')
 		listDiv.className = 'se-submenu se-list-layer se-emojis-layer'
@@ -332,12 +331,9 @@ const emojis = (function(Emojis) {	// eslint-disable-line no-unused-vars
 					console.log(`error: emoji does not exist for type '${group}'`)
 				}
 			}
-			/*
-			let end = window.performance.now()
-			let time = end - start
-			console.log(time)
-			*/
-			document.body.style.cursor = 'default'
+			//let end = window.performance.now()
+			//let time = end - start
+			//console.log(time)
 		} else {
 			const cnt = listDiv.querySelector('div[name="emojis"]')
 			if (reset && cnt) cnt.innerText = ''
@@ -487,10 +483,16 @@ const emojis = (function(Emojis) {	// eslint-disable-line no-unused-vars
 			return
 		}
 		const cnt = document.querySelector('div[name="' + result_name + '"] div')
+		const exists = function(emoji) {
+			const btns = cnt.querySelectorAll('.btn-emoji')
+			for (const btn of btns) {
+				if (btn.querySelector('span').getAttribute('data-emoji') === emoji) return true
+			}
+		}
 		for (let type in Emojis.emojis) {
 			Emojis.emojis[type].forEach(function(emoji) {
 				if (emoji && emoji.name.toLowerCase().indexOf(term) > -1) {
-					createBtn(emoji, cnt)
+					if (exists(emoji.emoji) !== true) createBtn(emoji, cnt)
 				}
 			})
 		}
