@@ -1,6 +1,5 @@
 "use strict";
 
-
 const Playground = (function() {
 	const gebi = (id) => { return document.getElementById(id) }
 	const qsel = (sel) => { return document.querySelector(sel) }
@@ -9,8 +8,130 @@ const Playground = (function() {
 	let editor = undefined
 	
 	const init = function() {
+		fetchVersions()
 		initForm()
-		updateEditor()
+	}
+
+	const fetchVersions = function() {
+		return new Promise(function(resolve) {
+			try {
+				fetch('https://registry.npmjs.org/suneditor', {
+					method: 'GET',
+					headers: { 'Accept': 'application/json' }
+				})
+				.then(response => response.json())
+				.then(response => resolve(initVersions(response)))
+			} catch(error) {
+				console.log('fetchVersions', error)
+				resolve(error)
+			}
+		})
+	}
+
+	const initVersions = function(r) {
+/*
+		const prefix = {
+			'2.0': {
+				js: '/src/',
+				css: '/src/css/
+*/
+		const version = storage('suneditor-version') || 'latest'
+		//setVersion(version)
+		fetchSunEditor(version)
+		const sel = gebi('select-versions')
+		const versions = Object.keys(r.versions).sort(function(a,b) {
+			return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+		})
+/*
+		Object.keys(r.versions).forEach(function(ver) {
+			if (ver.localeCompare('2.0.0', undefined, { numeric: true, sensitivity: 'base' }) === 1) { //https://stackoverflow.com/a/65687141/1407478
+				sel.insertAdjacentHTML('afterbegin', `<option value="${ver}">${ver}</option>`)
+			}
+		})
+*/
+		versions.forEach(function(ver) {
+			sel.insertAdjacentHTML('afterbegin', `<option value="${ver}">${ver}</option>`)
+		})
+
+		setTimeout(function() {
+			sel.insertAdjacentHTML('afterbegin', '<option value="latest">latest</option>')
+			sel.value = version
+		})
+		sel.onchange = function() {
+			storage( { 'suneditor-version': this.value })
+			location.reload()
+			//setVersion(this.value, true)
+		}
+	}
+
+/*
+	const setVersion = function(ver) {
+		const h = document.head
+		let c = h.querySelector('#suneditor-css')
+		if (!c) {
+			c = document.createElement('link')
+			c.setAttribute('id', 'suneditor-css')
+			c.setAttribute('rel', 'stylesheet')
+			h.prepend(c)
+		}
+		const fname = ver.localeCompare('3.0.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0 ? '/dist/suneditor.min.css' : '/dist/css/suneditor.min.css'
+		c.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + fname)
+		let s = h.querySelector('#suneditor-js')
+		if (!s) {
+			s = document.createElement('script')
+			s.setAttribute('id', 'suneditor-js')
+		}
+		s.onload = function() {
+			console.log('ok')
+			updateEditor()
+		}
+		s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/suneditor.min.js')
+		h.appendChild(s)
+//		s.addEventListener('load', function() {
+	}
+*/
+	const fetchSunEditor = function(ver) {
+		const setVer3 = function(l, s) {
+			l.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/suneditor.min.css')
+			s.setAttribute('type', 'module')
+			s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/src/suneditor.js')
+		}
+		const setVer228 = function(l, s) {
+			l.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/css/suneditor.min.css')
+			s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/suneditor.min.js')
+		}
+
+		const h = document.head
+		const l = document.createElement('link')
+		l.setAttribute('rel', 'stylesheet')
+		const s = document.createElement('script')
+
+		if (ver.localeCompare('3.0.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) {
+			console.log('v3')
+			setVer3(l, s)
+		} else if (ver.localeCompare('2.28.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) {
+			console.log('v228')
+			setVer228(l, s)
+		}
+
+		s.addEventListener('load', function() {
+			updateEditor()
+		})
+
+		h.prepend(l)
+		h.appendChild(s)
+/*
+		//const fname = ver.localeCompare('3.0.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0 ? '/dist/suneditor.min.css' : '/dist/css/suneditor.min.css'
+		//c.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + fname)
+		//let s = h.querySelector('#suneditor-js')
+		s.onload = function() {
+			console.log('ok')
+			updateEditor()
+		}
+		s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/suneditor.min.js')
+		h.appendChild(s)
+//		s.addEventListener('load', function() {
+*/
 	}
 
 	const storage = function(o) {
@@ -256,6 +377,7 @@ const Playground = (function() {
 		options.emojis = opt 
 		if (editor) editor.destroy()
 		editor = SUNEDITOR.create('editor', options)	// eslint-disable-line no-undef
+		//editor = SUNEDITOR.create(document.querySelector('#editor'), options)	// eslint-disable-line no-undef
 		editor.setContents('<p>Lorem ipsum</p>')
 		qsel('.sun-editor-editable').tabIndex = -1
 		qsel('.sun-editor-editable').focus()

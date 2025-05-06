@@ -6,8 +6,10 @@
 <meta name="description" content="Emojis dropdown plugin for SunEditor, the wysywyg editor">
 <link rel="shortcut icon" href="#">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<!--
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css">
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+-->
 <script src="src/playground.js"></script>
 <link href="src/playground.css" rel="stylesheet" type="text/css" >
 
@@ -178,6 +180,10 @@
 </aside>
 
 <main>
+	<label for="select-versions" class="label-versions">
+		SunEditor version:&nbsp;
+		<select id="select-versions"></select>
+	</label>
 	<textarea id="editor" tabindex="-1"></textarea><br>
 	<details open>
 		<summary>

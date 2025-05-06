@@ -144,3 +144,15 @@ select {
 .option-margin-bottom {
 	margin-bottom: .3rem;
 }
+
+label.label-versions {
+	font-family: system-ui, sans-serif; 
+	display: block;
+	margin-bottom: .3rem;
+}
+
+label.label-versions select {
+	background-color: transparent;
+}
+
+
