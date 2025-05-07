@@ -1,3 +1,9 @@
+/*
+ * Playground for suneditor-emojis
+ * Copyright 2025- David Konrad
+ *
+ */
+
 "use strict";
 
 const Playground = (function() {
@@ -6,53 +12,64 @@ const Playground = (function() {
 	const qall = (sel) => { return document.querySelectorAll(sel) }
 	const default_iconSize = '1.7rem'
 	let editor = undefined
-	
+	let version = undefined
+	let initmode = undefined
+
 	const init = function() {
 		fetchVersions()
 		initForm()
 	}
 
+	const wait = function(mode) {
+		const b = qsel('body')
+		if (!mode) {
+			b.classList.remove('wait')
+			window.scrollTo({ top: 0 })
+		} else {
+			b.classList.add('wait')
+		}
+	}
+
 	const fetchVersions = function() {
-		return new Promise(function(resolve) {
+		let v = storage('suneditor-versions-list') || false
+		if (v) {
+			initVersions(JSON.parse(v)) 
+		} else {
 			try {
 				fetch('https://registry.npmjs.org/suneditor', {
 					method: 'GET',
 					headers: { 'Accept': 'application/json' }
 				})
 				.then(response => response.json())
-				.then(response => resolve(initVersions(response)))
+				.then(function(response) {
+					v = Object.keys(response.versions).sort(function(a, b) {
+						return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }) //https://stackoverflow.com/a/65687141/1407478
+					})
+					v = v.filter(function(a) {
+						if (a.localeCompare('2.28.0', undefined, { numeric: true, sensitivity: 'base' }) > 0) return a
+					})
+					storage({ 'suneditor-versions-list': v })
+					initVersions(v)
+				})
 			} catch(error) {
 				console.log('fetchVersions', error)
 				resolve(error)
 			}
-		})
+		}
 	}
 
-	const initVersions = function(r) {
-/*
-		const prefix = {
-			'2.0': {
-				js: '/src/',
-				css: '/src/css/
-*/
-		const version = storage('suneditor-version') || 'latest'
-		//setVersion(version)
-		fetchSunEditor(version)
+	const initVersions = function(versions) {
+		version = storage('suneditor-version') || 'latest'
+		fetchSunEditor()
 		const sel = gebi('select-versions')
-		const versions = Object.keys(r.versions).sort(function(a,b) {
-			return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-		})
 /*
-		Object.keys(r.versions).forEach(function(ver) {
-			if (ver.localeCompare('2.0.0', undefined, { numeric: true, sensitivity: 'base' }) === 1) { //https://stackoverflow.com/a/65687141/1407478
-				sel.insertAdjacentHTML('afterbegin', `<option value="${ver}">${ver}</option>`)
-			}
+		const versions = Object.keys(r.versions).sort(function(a, b) {
+			return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
 		})
 */
 		versions.forEach(function(ver) {
 			sel.insertAdjacentHTML('afterbegin', `<option value="${ver}">${ver}</option>`)
 		})
-
 		setTimeout(function() {
 			sel.insertAdjacentHTML('afterbegin', '<option value="latest">latest</option>')
 			sel.value = version
@@ -60,7 +77,6 @@ const Playground = (function() {
 		sel.onchange = function() {
 			storage( { 'suneditor-version': this.value })
 			location.reload()
-			//setVersion(this.value, true)
 		}
 	}
 
@@ -90,48 +106,28 @@ const Playground = (function() {
 //		s.addEventListener('load', function() {
 	}
 */
-	const fetchSunEditor = function(ver) {
-		const setVer3 = function(l, s) {
-			l.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/suneditor.min.css')
-			s.setAttribute('type', 'module')
-			s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/src/suneditor.js')
-		}
-		const setVer228 = function(l, s) {
-			l.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/css/suneditor.min.css')
-			s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/suneditor.min.js')
-		}
-
+	const fetchSunEditor = function() {
+		wait(true)
 		const h = document.head
 		const l = document.createElement('link')
-		l.setAttribute('rel', 'stylesheet')
 		const s = document.createElement('script')
-
-		if (ver.localeCompare('3.0.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) {
-			console.log('v3')
-			setVer3(l, s)
-		} else if (ver.localeCompare('2.28.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) {
-			console.log('v228')
-			setVer228(l, s)
+		l.setAttribute('rel', 'stylesheet')
+		if (version.localeCompare('3.0.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) {
+			l.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + version + '/dist/suneditor.min.css')
+			s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + version + '/dist/suneditor.min.js')
+			initmode = 'v3'
+			//first supported version is 2.28.1
+		} else if (version.localeCompare('2.28.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) { 
+			initmode = 'v228'
+			l.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + version + '/dist/css/suneditor.min.css')
+			s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + version + '/dist/suneditor.min.js')
 		}
-
 		s.addEventListener('load', function() {
 			updateEditor()
+			wait()
 		})
-
 		h.prepend(l)
 		h.appendChild(s)
-/*
-		//const fname = ver.localeCompare('3.0.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0 ? '/dist/suneditor.min.css' : '/dist/css/suneditor.min.css'
-		//c.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + fname)
-		//let s = h.querySelector('#suneditor-js')
-		s.onload = function() {
-			console.log('ok')
-			updateEditor()
-		}
-		s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/suneditor.min.js')
-		h.appendChild(s)
-//		s.addEventListener('load', function() {
-*/
 	}
 
 	const storage = function(o) {
@@ -360,25 +356,56 @@ const Playground = (function() {
 	}
 
 	const initEditor = function(opt) {
+/*
+				const options = {
+					iframe: false, //!!v3
+					mode: 'classic',
+					width: '100%',
+					height: 'auto',
+					minHeight : '30vh',
+					plugins: [emojis],	// eslint-disable-line no-undef
+					buttonList: [
+						['font', 'fontSize', 'formatBlock'], ['emojis'],
+						['bold', 'underline', 'italic', 'strike', 'removeFormat'],
+						['fontColor', 'hiliteColor'], 
+					],
+					defaultStyle: "font-size:1.5rem;"
+				}
+				options.emojis = opt 
+*/
 		opt = opt || {}
-		const options = {
-			mode: 'classic',
-			width: '100%',
-			height: 'auto',
-			minHeight : '30vh',
-			plugins: [emojis],	// eslint-disable-line no-undef
-			buttonList: [
-				['font', 'fontSize', 'formatBlock'], ['emojis'],
-				['bold', 'underline', 'italic', 'strike', 'removeFormat'],
-				['fontColor', 'hiliteColor'], 
-			],
-			defaultStyle: "font-size:1.5rem;"
-		}
-		options.emojis = opt 
+		//const options = {}
+		let options = undefined
 		if (editor) editor.destroy()
-		editor = SUNEDITOR.create('editor', options)	// eslint-disable-line no-undef
+		switch (initmode) {
+			case 'v3' :
+				options = {
+					v2Migration: true 
+				}
+				editor = SUNEDITOR.create(document.querySelector('#editor'), options)	// eslint-disable-line no-undef
+				break;
+			default : 
+				options = {
+					iframe: false, //!!v3
+					mode: 'classic',
+					width: '100%',
+					height: 'auto',
+					minHeight : '30vh',
+					plugins: [emojis],	// eslint-disable-line no-undef
+					buttonList: [
+						['font', 'fontSize', 'formatBlock'], ['emojis'],
+						['bold', 'underline', 'italic', 'strike', 'removeFormat'],
+						['fontColor', 'hiliteColor'], 
+					],
+					defaultStyle: "font-size:1.5rem;"
+				}
+				options.emojis = opt 
+				editor = SUNEDITOR.create('editor', options)	// eslint-disable-line no-undef
+				break;
+		}
 		//editor = SUNEDITOR.create(document.querySelector('#editor'), options)	// eslint-disable-line no-undef
-		editor.setContents('<p>Lorem ipsum</p>')
+		console.dir(editor)
+		//editor.setContents('<p>Lorem ipsum</p>')
 		qsel('.sun-editor-editable').tabIndex = -1
 		qsel('.sun-editor-editable').focus()
 	}
