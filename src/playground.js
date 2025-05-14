@@ -30,6 +30,10 @@ const Playground = (function() {
 		}
 	}
 
+	const isVersion = function(str, version) {
+		return str.localeCompare(version, undefined, { numeric: true, sensitivity: 'base' }) >= 0
+	}
+
 	const fetchVersions = function() {
 		let v = storage('suneditor-versions-list') || false
 		if (v) {
@@ -46,7 +50,7 @@ const Playground = (function() {
 						return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }) //https://stackoverflow.com/a/65687141/1407478
 					})
 					v = v.filter(function(a) {
-						if (a.localeCompare('2.28.0', undefined, { numeric: true, sensitivity: 'base' }) > 0) return a
+						if (a.localeCompare('2.35.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) return a
 					})
 					storage({ 'suneditor-versions-list': v })
 					initVersions(v)
@@ -62,16 +66,15 @@ const Playground = (function() {
 		version = storage('suneditor-version') || 'latest'
 		fetchSunEditor()
 		const sel = gebi('select-versions')
-/*
-		const versions = Object.keys(r.versions).sort(function(a, b) {
-			return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-		})
-*/
 		versions.forEach(function(ver) {
-			sel.insertAdjacentHTML('afterbegin', `<option value="${ver}">${ver}</option>`)
+			if (isVersion(ver, '3.0.0')) {
+				sel.insertAdjacentHTML('beforeend', `<option value="${ver}" style="color:gray;" title="v3 is not supported (yet)">${ver}</option>`)
+			} else {
+				sel.insertAdjacentHTML('afterbegin', `<option value="${ver}">${ver}</option>`)
+			}
 		})
 		setTimeout(function() {
-			sel.insertAdjacentHTML('afterbegin', '<option value="latest">latest</option>')
+			sel.insertAdjacentHTML('afterbegin', '<option value="latest" style="color:gray;" title="v3 is not supported (yet)">latest</option>')
 			sel.value = version
 		})
 		sel.onchange = function() {
@@ -80,45 +83,21 @@ const Playground = (function() {
 		}
 	}
 
-/*
-	const setVersion = function(ver) {
-		const h = document.head
-		let c = h.querySelector('#suneditor-css')
-		if (!c) {
-			c = document.createElement('link')
-			c.setAttribute('id', 'suneditor-css')
-			c.setAttribute('rel', 'stylesheet')
-			h.prepend(c)
-		}
-		const fname = ver.localeCompare('3.0.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0 ? '/dist/suneditor.min.css' : '/dist/css/suneditor.min.css'
-		c.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + fname)
-		let s = h.querySelector('#suneditor-js')
-		if (!s) {
-			s = document.createElement('script')
-			s.setAttribute('id', 'suneditor-js')
-		}
-		s.onload = function() {
-			console.log('ok')
-			updateEditor()
-		}
-		s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + ver + '/dist/suneditor.min.js')
-		h.appendChild(s)
-//		s.addEventListener('load', function() {
-	}
-*/
 	const fetchSunEditor = function() {
 		wait(true)
 		const h = document.head
 		const l = document.createElement('link')
 		const s = document.createElement('script')
 		l.setAttribute('rel', 'stylesheet')
-		if (version.localeCompare('3.0.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) {
+		if (version !== 'latest' && isVersion(version, '3.0.0')) {
 			l.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + version + '/dist/suneditor.min.css')
 			s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + version + '/dist/suneditor.min.js')
+			/* use Pre-packaged SunEditor 3 alpha v20, https://github.com/JiHong88/suneditor/issues/1533
+			l.setAttribute('href', 'Pre-packaged SunEditor 3 alpha v20/suneditor.min.css')
+			s.setAttribute('src', 'Pre-packaged SunEditor 3 alpha v20/suneditor.min.js')
+			*/
 			initmode = 'v3'
-			//first supported version is 2.28.1
-		} else if (version.localeCompare('2.28.0', undefined, { numeric: true, sensitivity: 'base' }) >= 0) { 
-			initmode = 'v228'
+		} else { 
 			l.setAttribute('href', 'https://cdn.jsdelivr.net/npm/suneditor@' + version + '/dist/css/suneditor.min.css')
 			s.setAttribute('src', 'https://cdn.jsdelivr.net/npm/suneditor@' + version + '/dist/suneditor.min.js')
 		}
@@ -380,13 +359,18 @@ const Playground = (function() {
 		switch (initmode) {
 			case 'v3' :
 				options = {
-					v2Migration: true 
+					plugins: SUNEDITOR.Plugins,
+					buttonList: [
+						['font', 'fontSize', 'formatBlock'], // ['emojis'],
+						['bold', 'underline', 'italic', 'strike', 'removeFormat'],
+						['fontColor'], 
+					],
+					mode: 'classic',
 				}
 				editor = SUNEDITOR.create(document.querySelector('#editor'), options)	// eslint-disable-line no-undef
 				break;
 			default : 
 				options = {
-					iframe: false, //!!v3
 					mode: 'classic',
 					width: '100%',
 					height: 'auto',
@@ -403,9 +387,6 @@ const Playground = (function() {
 				editor = SUNEDITOR.create('editor', options)	// eslint-disable-line no-undef
 				break;
 		}
-		//editor = SUNEDITOR.create(document.querySelector('#editor'), options)	// eslint-disable-line no-undef
-		console.dir(editor)
-		//editor.setContents('<p>Lorem ipsum</p>')
 		qsel('.sun-editor-editable').tabIndex = -1
 		qsel('.sun-editor-editable').focus()
 	}

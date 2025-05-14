@@ -128,6 +128,8 @@ const Emojis = (function() {	// eslint-disable-line no-unused-vars
 
 	const getPath = function() {
 		const path = document.currentScript.src.split('/')
+		//module:
+		//const path = import.meta.url.split('/')
 		path.pop()
 		return path.join('/')
 	}
