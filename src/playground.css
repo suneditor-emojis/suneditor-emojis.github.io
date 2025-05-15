@@ -20,7 +20,7 @@ body {
 body.wait,
 body.wait > * { 
 	cursor: wait !important;
-	box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .1);
+	box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .02);
 }
 
 header h3 {
@@ -28,13 +28,17 @@ header h3 {
 	align-items: center;
 }
 
-header h3 a {
+a {
 	color: navy;
-	margin-left: .3rem;
 	text-decoration: none;
 }
-header h3 a:hover {
+
+a:hover {
 	color: royalblue;
+}
+
+header h3 a {
+	margin-left: .3rem;
 }
 
 aside {
@@ -141,6 +145,10 @@ select {
 	background: #e4eaef;
 	padding: 3px;
 }
+select,
+option:checked {
+	font-weight: bold;
+}
 
 .flex-row {
 	display: flex;
@@ -155,6 +163,7 @@ label.label-versions {
 	font-family: system-ui, sans-serif; 
 	display: block;
 	margin-bottom: .3rem;
+	font-size: small;
 }
 
 label.label-versions select {
